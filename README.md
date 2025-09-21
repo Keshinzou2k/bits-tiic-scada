@@ -1,3 +1,5 @@
+INDUSTRIAL SCADA
+<img width="1917" height="1079" alt="image" src="https://github.com/user-attachments/assets/44071445-2a75-4248-a207-5c8e977908a6" />
 # Web-Based SCADA System for VFD Monitoring
 
 A modern, industrial-grade web application for monitoring and controlling Variable Frequency Drives (VFDs) and motors in industrial environments. This SCADA (Supervisory Control and Data Acquisition) system provides real-time monitoring, alarm management, and equipment visualization with a professional yellow and black theme.
