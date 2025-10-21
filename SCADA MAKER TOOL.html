@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Attribute Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #34495e;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button:hover {
+            background-color: #3c5570;
+        }
+        
+        .tab-button.active {
+            background-color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 8px;
+        }
+        
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button.secondary {
+            background-color: #95a5a6;
+        }
+        
+        button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .output-section {
+            margin-top: 25px;
+            border-top: 2px solid #eaeaea;
+            padding-top: 20px;
+        }
+        
+        .output-container {
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #2ecc71;
+        }
+        
+        .copy-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .example-code {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        .json-example {
+            font-size: 0.9rem;
+        }
+        
+        .pattern-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .stats-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .stats-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #27ae60;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            background-color: white;
+            padding: 12px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .element-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .element-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .element-tag {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .element-id {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .attribute-list {
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .attribute-item {
+            display: inline-block;
+            background-color: #ecf0f1;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        
+        /* Attribute Filter Styles */
+        .attribute-filters {
+            background-color: #f8f9fa;
+            border-left: 4px solid #9b59b6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .filters-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #8e44ad;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .filter-label {
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .filter-label.active {
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        
+        .attribute-highlight {
+            transition: all 0.3s ease;
+        }
+        
+        .attribute-hidden {
+            display: none;
+        }
+        
+        .attribute-visible {
+            display: inline;
+        }
+        
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SVG Attribute Editor</h1>
+            <p class="description">A tool for editing SVG files with regex, mapping JSON attributes, and analyzing SVG structure</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="regex">Regex Editor</button>
+            <button class="tab-button" data-tab="json">JSON to Attributes</button>
+            <button class="tab-button" data-tab="analyzer">SVG Structure Analyzer</button>
+        </div>
+        
+        <!-- Regex Editor Tab -->
+        <div id="regex" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">Regex Editor</h2>
+                <p>Use regular expressions to find and replace text in your SVG content.</p>
+                
+                <div class="example-box">
+                    <div class="example-title">Example:</div>
+                    <div class="example-code">
+Find: &lt;g id="PE-PS-(\d+)"&gt;
+Replace: &lt;g id="PE-PS-$1" equipment_id="PE-PS-$1"&gt;
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <label for="svg-input-regex">SVG Content:</label>
+                    <textarea id="svg-input-regex" placeholder="Paste your SVG content here..."></textarea>
+                </div>
+                
+                <div class="section">
+                    <label for="find-regex">Find (Regex Pattern):</label>
+                    <input type="text" id="find-regex" placeholder="Enter regex pattern to find...">
+                </div>
+                
+                <div class="section">
+                    <label for="replace-regex">Replace With:</label>
+                    <input type="text" id="replace-regex" placeholder="Enter replacement text...">
+                </div>
+                
+                <div class="button-group">
+                    <button id="apply-regex">Apply Regex</button>
+                    <button id="reset-regex" class="secondary">Reset</button>
+                </div>
+                
+                <div class="output-section">
+                    <h2 class="section-title">Result</h2>
+                    <div class="output-container">
+                        <textarea id="regex-output" placeholder="Result will appear here..." readonly></textarea>
+                        <button class="copy-btn" id="copy-regex">Copy Result</button>
+                    </div>
+                    <div id="regex-message" class="message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- JSON to Attributes SVG Plotter Tab -->
+        <div id="json" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">JSON to Attributes SVG Plotter</h2>
+                <p>Map JSON data to SVG element attributes based on matching IDs.</p>
+                
+                <div class="example-box">
+                    <div class="example-title">Example JSON:</div>
+                    <div class="example-code json-example">
+[
+  {
+    "equipment_id": "PE-PS-263",
+    "equipment_name": "MIXER MACHINE",
+    "power_rating": "33 HP",
+    "voltage": "",
+    "equipment_details": "30 HP Drive Motor with inverter",
+    "vfd_brand_model": "TECO A510s",
+    "vfd_location": "EE ROOM 3"
+  }
+]
+                    </div>
+                    <div class="example-title">Result:</div>
+                    <div class="example-code">
+&lt;g id="PE-PS-263" equipment_id="PE-PS-263" equipment_name="MIXER MACHINE" 
+   power_rating="33 HP" voltage="" equipment_details="30 HP Drive Motor with inverter" 
+   vfd_brand_model="TECO A510s" vfd_location="EE ROOM 3"&gt;
+                    </div>
+                    <div class="example-title">Section Data Example:</div>
+                    <div class="example-code">
+&lt;g id="OLDPLATFORM" section_name="OLD PLATFORM" section_total_vfds="12" section_unique_models="3"&gt;
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <label for="svg-input-json">SVG Content:</label>
+                    <textarea id="svg-input-json" placeholder="Paste your SVG content here..."></textarea>
+                </div>
+                
+                <div class="section">
+                    <label for="json-input">JSON Data:</label>
+                    <textarea id="json-input" placeholder="Paste your JSON data here..."></textarea>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title">Custom Patterns</h3>
+                    
+                    <div class="section">
+                        <label for="equipment-pattern">Equipment Pattern:</label>
+                        <input type="text" id="equipment-pattern" value='(<g\\s+id="{id}")([^>]*>)' placeholder="Enter pattern for equipment matching...">
+                        <div class="pattern-info">Use {id} as placeholder for equipment ID. Must have two capture groups.</div>
+                    </div>
+                    
+                    <div class="section">
+                        <label for="section-pattern">Section Pattern:</label>
+                        <input type="text" id="section-pattern" value='(<g\\s+id="{id}")([^>]*>)' placeholder="Enter pattern for section matching...">
+                        <div class="pattern-info">Use {id} as placeholder for section ID. Must have two capture groups.</div>
+                    </div>
+                    
+                    <div class="section">
+                        <label for="section-id-transform">Section ID Transformation:</label>
+                        <input type="text" id="section-id-transform" value="UPPERCASE_NO_SPACES" placeholder="Enter transformation rule...">
+                        <div class="pattern-info">Options: UPPERCASE_NO_SPACES, LOWERCASE_NO_SPACES, NO_SPACES, UPPERCASE, LOWERCASE, NONE</div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="apply-json">Apply JSON Mapping</button>
+                    <button id="reset-json" class="secondary">Reset</button>
+                </div>
+                
+                <div class="output-section">
+                    <h2 class="section-title">Result</h2>
+                    <div class="output-container">
+                        <textarea id="json-output" placeholder="Result will appear here..." readonly></textarea>
+                        <button class="copy-btn" id="copy-json">Copy Result</button>
+                    </div>
+                    <div id="json-message" class="message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SVG Structure Analyzer Tab -->
+        <div id="analyzer" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">SVG Structure Analyzer</h2>
+                <p>Analyze SVG structure and extract important attributes, filtering out styling and transform data.</p>
+                
+                <div class="example-box">
+                    <div class="example-title">What gets extracted:</div>
+                    <div class="example-code">
+- id, equipment_id, equipment_name, power_rating, voltage
+- equipment_details, vfd_brand_model, vfd_location
+- section_name, section_total_vfds, section_unique_models
+- Other meaningful data attributes
+- Text content as value attribute for text/tspan elements
+
+What gets filtered out:
+- Styles, transforms, coordinates, dimensions
+- Inkscape/Sodipodi metadata
+- Visual presentation attributes
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <label for="svg-input-analyzer">SVG Content:</label>
+                    <textarea id="svg-input-analyzer" placeholder="Paste your SVG content here..."></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button id="analyze-svg">Analyze SVG Structure</button>
+                    <button id="reset-analyzer" class="secondary">Reset</button>
+                </div>
+                
+                <div class="output-section">
+                    <h2 class="section-title">Analysis Results</h2>
+                    
+                    <div class="stats-box">
+                        <div class="stats-title">SVG Structure Summary</div>
+                        <div id="stats-container" class="stats-grid">
+                            <!-- Stats will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-filters">
+                        <div class="filters-title">Attribute Filters</div>
+                        <div class="filter-grid" id="attribute-filters-container">
+                            <!-- Attribute filters will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Elements with Important Attributes</h3>
+                        <div id="elements-container" class="element-list">
+                            <!-- Elements will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Interactive SVG Structure</h3>
+                        <div class="output-container">
+                            <textarea id="analyzer-output" placeholder="Interactive SVG will appear here..." readonly></textarea>
+                            <button class="copy-btn" id="copy-analyzer">Copy Result</button>
+                        </div>
+                    </div>
+                    
+                    <div id="analyzer-message" class="message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and content
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // Regex Editor functionality
+        document.getElementById('apply-regex').addEventListener('click', () => {
+            const svgInput = document.getElementById('svg-input-regex').value;
+            const findRegex = document.getElementById('find-regex').value;
+            const replaceText = document.getElementById('replace-regex').value;
+            const output = document.getElementById('regex-output');
+            const message = document.getElementById('regex-message');
+            
+            if (!svgInput) {
+                showMessage(message, 'Please enter SVG content', 'error');
+                return;
+            }
+            
+            if (!findRegex) {
+                showMessage(message, 'Please enter a regex pattern to find', 'error');
+                return;
+            }
+            
+            try {
+                const regex = new RegExp(findRegex, 'g');
+                const result = svgInput.replace(regex, replaceText);
+                output.value = result;
+                showMessage(message, 'Regex applied successfully!', 'success');
+            } catch (e) {
+                showMessage(message, 'Invalid regex pattern: ' + e.message, 'error');
+            }
+        });
+        
+        document.getElementById('reset-regex').addEventListener('click', () => {
+            document.getElementById('svg-input-regex').value = '';
+            document.getElementById('find-regex').value = '';
+            document.getElementById('replace-regex').value = '';
+            document.getElementById('regex-output').value = '';
+            document.getElementById('regex-message').style.display = 'none';
+        });
+        
+        document.getElementById('copy-regex').addEventListener('click', () => {
+            const output = document.getElementById('regex-output');
+            if (output.value) {
+                output.select();
+                document.execCommand('copy');
+                showMessage(document.getElementById('regex-message'), 'Result copied to clipboard!', 'success');
+            }
+        });
+        
+        // JSON to Attributes functionality
+        document.getElementById('apply-json').addEventListener('click', () => {
+            const svgInput = document.getElementById('svg-input-json').value;
+            const jsonInput = document.getElementById('json-input').value;
+            const equipmentPatternTemplate = document.getElementById('equipment-pattern').value;
+            const sectionPatternTemplate = document.getElementById('section-pattern').value;
+            const sectionIdTransform = document.getElementById('section-id-transform').value;
+            const output = document.getElementById('json-output');
+            const message = document.getElementById('json-message');
+            
+            if (!svgInput) {
+                showMessage(message, 'Please enter SVG content', 'error');
+                return;
+            }
+            
+            if (!jsonInput) {
+                showMessage(message, 'Please enter JSON data', 'error');
+                return;
+            }
+            
+            if (!equipmentPatternTemplate.includes('{id}')) {
+                showMessage(message, 'Equipment pattern must contain {id} placeholder', 'error');
+                return;
+            }
+            
+            if (!sectionPatternTemplate.includes('{id}')) {
+                showMessage(message, 'Section pattern must contain {id} placeholder', 'error');
+                return;
+            }
+            
+            try {
+                const jsonData = JSON.parse(jsonInput);
+                let result = svgInput;
+                
+                // Function to transform section names to IDs
+                function transformSectionId(name, transformType) {
+                    switch(transformType) {
+                        case 'UPPERCASE_NO_SPACES':
+                            return name.replace(/\s+/g, '').toUpperCase();
+                        case 'LOWERCASE_NO_SPACES':
+                            return name.replace(/\s+/g, '').toLowerCase();
+                        case 'NO_SPACES':
+                            return name.replace(/\s+/g, '');
+                        case 'UPPERCASE':
+                            return name.toUpperCase();
+                        case 'LOWERCASE':
+                            return name.toLowerCase();
+                        case 'NONE':
+                        default:
+                            return name;
+                    }
+                }
+                
+                // Function to escape regex special characters
+                function escapeRegExp(string) {
+                    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                }
+                
+                // Process section data if available
+                if (jsonData.sections) {
+                    jsonData.sections.forEach(section => {
+                        // Transform section name to ID based on user preference
+                        const sectionId = transformSectionId(section.name, sectionIdTransform);
+                        
+                        // Create regex pattern for section
+                        const sectionPattern = sectionPatternTemplate.replace(/{id}/g, escapeRegExp(sectionId));
+                        const sectionRegex = new RegExp(sectionPattern, 'g');
+                        
+                        // Build section attribute string
+                        let sectionAttributes = ` section_name="${section.name}"`;
+                        sectionAttributes += ` section_total_vfds="${section.total_vfds}"`;
+                        sectionAttributes += ` section_unique_models="${section.unique_models}"`;
+                        
+                        // Replace the section opening tag with added attributes
+                        result = result.replace(sectionRegex, `$1${sectionAttributes}$2`);
+                    });
+                    
+                    // Process equipment data within sections
+                    jsonData.sections.forEach(section => {
+                        section.equipment.forEach(item => {
+                            if (item.equipment_id) {
+                                // Create regex pattern for equipment
+                                const equipmentPattern = equipmentPatternTemplate.replace(/{id}/g, escapeRegExp(item.equipment_id));
+                                const elementRegex = new RegExp(equipmentPattern, 'g');
+                                
+                                // Build attribute string
+                                let attributes = '';
+                                for (const [key, value] of Object.entries(item)) {
+                                    attributes += ` ${key}="${value}"`;
+                                }
+                                
+                                // Replace the opening tag with added attributes
+                                result = result.replace(elementRegex, `$1${attributes}$2`);
+                            }
+                        });
+                    });
+                } else {
+                    // Process equipment data without sections
+                    jsonData.forEach(item => {
+                        if (item.equipment_id) {
+                            // Create regex pattern for equipment
+                            const equipmentPattern = equipmentPatternTemplate.replace(/{id}/g, escapeRegExp(item.equipment_id));
+                            const elementRegex = new RegExp(equipmentPattern, 'g');
+                            
+                            // Build attribute string
+                            let attributes = '';
+                            for (const [key, value] of Object.entries(item)) {
+                                attributes += ` ${key}="${value}"`;
+                            }
+                            
+                            // Replace the opening tag with added attributes
+                            result = result.replace(elementRegex, `$1${attributes}$2`);
+                        }
+                    });
+                }
+                
+                output.value = result;
+                showMessage(message, 'JSON mapping applied successfully!', 'success');
+            } catch (e) {
+                showMessage(message, 'Error processing JSON: ' + e.message, 'error');
+            }
+        });
+        
+        document.getElementById('reset-json').addEventListener('click', () => {
+            document.getElementById('svg-input-json').value = '';
+            document.getElementById('json-input').value = '';
+            document.getElementById('json-output').value = '';
+            document.getElementById('json-message').style.display = 'none';
+            
+            // Reset patterns to defaults
+            document.getElementById('equipment-pattern').value = '(<g\\s+id="{id}")([^>]*>)';
+            document.getElementById('section-pattern').value = '(<g\\s+id="{id}")([^>]*>)';
+            document.getElementById('section-id-transform').value = 'UPPERCASE_NO_SPACES';
+        });
+        
+        document.getElementById('copy-json').addEventListener('click', () => {
+            const output = document.getElementById('json-output');
+            if (output.value) {
+                output.select();
+                document.execCommand('copy');
+                showMessage(document.getElementById('json-message'), 'Result copied to clipboard!', 'success');
+            }
+        });
+        
+        // SVG Structure Analyzer functionality
+        document.getElementById('analyze-svg').addEventListener('click', () => {
+            const svgInput = document.getElementById('svg-input-analyzer').value;
+            const statsContainer = document.getElementById('stats-container');
+            const filtersContainer = document.getElementById('attribute-filters-container');
+            const elementsContainer = document.getElementById('elements-container');
+            const output = document.getElementById('analyzer-output');
+            const message = document.getElementById('analyzer-message');
+            
+            if (!svgInput) {
+                showMessage(message, 'Please enter SVG content', 'error');
+                return;
+            }
+            
+            try {
+                // Parse the SVG
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svgInput, 'image/svg+xml');
+                
+                if (doc.querySelector('parsererror')) {
+                    showMessage(message, 'Invalid SVG content', 'error');
+                    return;
+                }
+                
+                // Define attributes to ALWAYS KEEP (important semantic attributes)
+                const keepAttributes = [
+                    'id', 'equipment_id', 'equipment_name', 'power_rating', 'voltage',
+                    'equipment_details', 'vfd_brand_model', 'vfd_location',
+                    'section_name', 'section_total_vfds', 'section_unique_models',
+                    'name', 'class', 'data-*'
+                ];
+                
+                // Define attributes to filter out (styling, transforms, etc.)
+                const filterAttributes = [
+                    'style', 'transform', 'x', 'y', 'width', 'height', 'cx', 'cy', 'r', 'rx', 'ry',
+                    'd', 'points', 'viewBox', 'version', 'sodipodi:docname', 'inkscape:export-filename', 
+                    'inkscape:export-xdpi', 'inkscape:export-ydpi', 'inkscape:version', 'xml:space',
+                    'xmlns:inkscape', 'xmlns:sodipodi', 'xmlns:svg',
+                    'fill', 'stroke', 'stroke-width', 'opacity', 'visibility', 'display',
+                    'pagecolor', 'bordercolor', 'borderopacity', 'inkscape:showpageshadow',
+                    'inkscape:pageopacity', 'inkscape:pagecheckerboard', 'inkscape:deskcolor',
+                    'showgrid', 'inkscape:zoom', 'inkscape:cx', 'inkscape:cy', 'inkscape:window-width',
+                    'inkscape:window-height', 'inkscape:window-maximized', 'inkscape:current-layer',
+                    'inkscape:export-bgcolor', 'inkscape:window-x', 'inkscape:window-y',
+                    'font-family', 'font-size', 'font-weight', 'text-anchor', 'text-decoration'
+                ];
+                
+                // Attribute categories for filtering
+                const attributeCategories = {
+                    'id': { label: 'ID', pattern: /^id$/, active: true },
+                    'equipment': { label: 'Equipment', pattern: /^equipment_/, active: true },
+                    'section': { label: 'Section', pattern: /^section_/, active: true },
+                    'vfd': { label: 'VFD', pattern: /^vfd_/, active: true },
+                    'power': { label: 'Power', pattern: /^(power_rating|voltage)$/, active: true },
+                    'text': { label: 'Text Content', pattern: /^value$/, active: true },
+                    'other': { label: 'Other', pattern: /^(name|class|data-)/, active: true }
+                };
+                
+                // Stats counters
+                let totalElements = 0;
+                let elementsWithId = 0;
+                let elementsWithImportantAttrs = 0;
+                let filteredElements = [];
+                
+                // Function to check if attribute should be kept
+                function shouldKeepAttribute(attrName, tagName) {
+                    // Always keep id attribute
+                    if (attrName === 'id') return true;
+                    
+                    // Check if attribute matches any keep patterns
+                    for (const pattern of keepAttributes) {
+                        if (pattern.endsWith('*') && attrName.startsWith(pattern.slice(0, -1))) {
+                            return true;
+                        }
+                        if (attrName === pattern) {
+                            return true;
+                        }
+                    }
+                    
+                    // Check equipment and section related patterns
+                    const importantPatterns = ['equipment_', 'section_', 'vfd_', 'power_', 'voltage'];
+                    for (const pattern of importantPatterns) {
+                        if (attrName.startsWith(pattern)) return true;
+                    }
+                    
+                    // Don't filter if it's not in the filter list
+                    return !shouldFilterAttribute(attrName);
+                }
+                
+                // Function to check if attribute should be filtered
+                function shouldFilterAttribute(attrName) {
+                    // Check exact matches
+                    if (filterAttributes.includes(attrName)) return true;
+                    
+                    // Check for namespace matches
+                    if (attrName.includes(':')) {
+                        const ns = attrName.split(':')[0];
+                        if (filterAttributes.includes(ns + ':*')) return true;
+                        if (filterAttributes.includes(attrName)) return true;
+                    }
+                    
+                    return false;
+                }
+                
+                // Function to get text content of an element
+                function getElementTextContent(element) {
+                    let textContent = '';
+                    
+                    // Check direct text content
+                    for (const child of element.childNodes) {
+                        if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+                            textContent += child.textContent.trim();
+                        }
+                    }
+                    
+                    return textContent;
+                }
+                
+                // Function to get attribute category
+                function getAttributeCategory(attrName) {
+                    for (const [category, config] of Object.entries(attributeCategories)) {
+                        if (config.pattern.test(attrName)) {
+                            return category;
+                        }
+                    }
+                    return 'other';
+                }
+                
+                // Recursive function to process elements
+                function processElement(element, depth = 0) {
+                    if (!element || element.nodeType !== 1) return null;
+                    
+                    totalElements++;
+                    
+                    const tagName = element.tagName.toLowerCase();
+                    const id = element.getAttribute('id');
+                    const hasId = !!id;
+                    if (hasId) elementsWithId++;
+                    
+                    // Collect attributes to keep
+                    const attributesToKeep = {};
+                    const attributeCategoriesFound = new Set();
+                    let hasImportantAttrs = false;
+                    
+                    // Process all attributes
+                    for (const attr of element.attributes) {
+                        const attrName = attr.name;
+                        const attrValue = attr.value;
+                        
+                        if (shouldKeepAttribute(attrName, tagName)) {
+                            attributesToKeep[attrName] = attrValue;
+                            hasImportantAttrs = true;
+                            
+                            // Track which categories we found
+                            const category = getAttributeCategory(attrName);
+                            attributeCategoriesFound.add(category);
+                        }
+                    }
+                    
+                    // Add text content as value attribute for text and tspan elements
+                    let textContent = '';
+                    if (tagName === 'text' || tagName === 'tspan') {
+                        textContent = getElementTextContent(element);
+                        if (textContent) {
+                            attributesToKeep['value'] = textContent;
+                            hasImportantAttrs = true;
+                            attributeCategoriesFound.add('text');
+                        }
+                    }
+                    
+                    if (hasImportantAttrs) elementsWithImportantAttrs++;
+                    
+                    // Process children
+                    const children = [];
+                    for (const child of element.children) {
+                        const processedChild = processElement(child, depth + 1);
+                        if (processedChild) {
+                            children.push(processedChild);
+                        }
+                    }
+                    
+                    // Include element if it has important attributes, text content, id, or important children
+                    const shouldInclude = hasImportantAttrs || textContent || hasId || children.length > 0;
+                    
+                    if (shouldInclude) {
+                        const elementData = {
+                            tag: tagName,
+                            id: id,
+                            attributes: attributesToKeep,
+                            attributeCategories: Array.from(attributeCategoriesFound),
+                            children: children,
+                            depth: depth,
+                            textContent: textContent
+                        };
+                        
+                        filteredElements.push(elementData);
+                        return elementData;
+                    }
+                    
+                    return null;
+                }
+                
+                // Process the SVG
+                const svgElement = doc.documentElement;
+                const processedSVG = processElement(svgElement);
+                
+                // Generate interactive SVG with attribute filtering
+                function generateInteractiveSVG(element, activeCategories) {
+                    if (!element) return '';
+                    
+                    let svgString = `<${element.tag}`;
+                    
+                    // Add all kept attributes with category classes
+                    for (const [attrName, attrValue] of Object.entries(element.attributes)) {
+                        const category = getAttributeCategory(attrName);
+                        const isActive = activeCategories[category];
+                        
+                        if (isActive) {
+                            svgString += ` ${attrName}="${attrValue}"`;
+                        }
+                    }
+                    
+                    if (element.children.length > 0) {
+                        svgString += '>\n';
+                        for (const child of element.children) {
+                            const childString = generateInteractiveSVG(child, activeCategories);
+                            // Indent child elements
+                            const indentation = '  '.repeat(child.depth);
+                            const indentedChild = childString.split('\n')
+                                .map(line => indentation + line)
+                                .join('\n');
+                            svgString += indentedChild + '\n';
+                        }
+                        svgString += `</${element.tag}>`;
+                    } else {
+                        svgString += ' />';
+                    }
+                    
+                    return svgString;
+                }
+                
+                // Create attribute filter checkboxes
+                function createAttributeFilters() {
+                    filtersContainer.innerHTML = '';
+                    
+                    for (const [category, config] of Object.entries(attributeCategories)) {
+                        const filterItem = document.createElement('div');
+                        filterItem.className = 'filter-item';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'filter-checkbox';
+                        checkbox.id = `filter-${category}`;
+                        checkbox.checked = config.active;
+                        checkbox.dataset.category = category;
+                        
+                        const label = document.createElement('label');
+                        label.className = `filter-label ${config.active ? 'active' : ''}`;
+                        label.htmlFor = `filter-${category}`;
+                        label.textContent = config.label;
+                        
+                        filterItem.appendChild(checkbox);
+                        filterItem.appendChild(label);
+                        filtersContainer.appendChild(filterItem);
+                        
+                        // Add event listener
+                        checkbox.addEventListener('change', function() {
+                            const category = this.dataset.category;
+                            attributeCategories[category].active = this.checked;
+                            label.classList.toggle('active', this.checked);
+                            
+                            // Update the SVG display
+                            const activeCategories = {};
+                            for (const [cat, config] of Object.entries(attributeCategories)) {
+                                activeCategories[cat] = config.active;
+                            }
+                            
+                            const updatedSVG = generateInteractiveSVG(processedSVG, activeCategories);
+                            output.value = updatedSVG;
+                        });
+                    }
+                }
+                
+                // Initialize with all categories active
+                const activeCategories = {};
+                for (const [category, config] of Object.entries(attributeCategories)) {
+                    activeCategories[category] = config.active;
+                }
+                
+                const interactiveSVG = processedSVG ? generateInteractiveSVG(processedSVG, activeCategories) : '';
+                output.value = interactiveSVG;
+                
+                // Create the attribute filters
+                createAttributeFilters();
+                
+                // Update stats
+                statsContainer.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${totalElements}</div>
+                        <div class="stat-label">Total Elements</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${elementsWithId}</div>
+                        <div class="stat-label">Elements with ID</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${elementsWithImportantAttrs}</div>
+                        <div class="stat-label">Elements with Important Attributes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${filteredElements.length}</div>
+                        <div class="stat-label">Filtered Elements</div>
+                    </div>
+                `;
+                
+                // Display elements with important attributes
+                elementsContainer.innerHTML = '';
+                filteredElements.forEach(element => {
+                    const elementDiv = document.createElement('div');
+                    elementDiv.className = 'element-item';
+                    
+                    let elementHTML = `<span class="element-tag">${element.tag}</span>`;
+                    if (element.id) {
+                        elementHTML += ` <span class="element-id">id="${element.id}"</span>`;
+                    }
+                    
+                    // Add text content display for text and tspan elements
+                    if ((element.tag === 'text' || element.tag === 'tspan') && element.textContent) {
+                        elementHTML += ` <span class="attribute-item" style="background-color: #3498db; color: white;">value="${element.textContent}"</span>`;
+                    }
+                    
+                    if (Object.keys(element.attributes).length > 0) {
+                        elementHTML += '<div class="attribute-list">';
+                        for (const [attrName, attrValue] of Object.entries(element.attributes)) {
+                            // Don't show value attribute again if we already showed it as text content
+                            if (!(element.tag === 'text' || element.tag === 'tspan') || attrName !== 'value') {
+                                const category = getAttributeCategory(attrName);
+                                const categoryColor = getCategoryColor(category);
+                                elementHTML += `<span class="attribute-item" style="background-color: ${categoryColor};">${attrName}="${attrValue}"</span>`;
+                            }
+                        }
+                        elementHTML += '</div>';
+                    }
+                    
+                    elementDiv.innerHTML = elementHTML;
+                    elementsContainer.appendChild(elementDiv);
+                });
+                
+                // Helper function to get color for category
+                function getCategoryColor(category) {
+                    const colors = {
+                        'id': '#e74c3c',
+                        'equipment': '#3498db',
+                        'section': '#2ecc71',
+                        'vfd': '#9b59b6',
+                        'power': '#f39c12',
+                        'text': '#1abc9c',
+                        'other': '#95a5a6'
+                    };
+                    return colors[category] || '#95a5a6';
+                }
+                
+                showMessage(message, 'SVG analysis completed successfully!', 'success');
+            } catch (e) {
+                showMessage(message, 'Error analyzing SVG: ' + e.message, 'error');
+            }
+        });
+        
+        document.getElementById('reset-analyzer').addEventListener('click', () => {
+            document.getElementById('svg-input-analyzer').value = '';
+            document.getElementById('analyzer-output').value = '';
+            document.getElementById('stats-container').innerHTML = '';
+            document.getElementById('attribute-filters-container').innerHTML = '';
+            document.getElementById('elements-container').innerHTML = '';
+            document.getElementById('analyzer-message').style.display = 'none';
+        });
+        
+        document.getElementById('copy-analyzer').addEventListener('click', () => {
+            const output = document.getElementById('analyzer-output');
+            if (output.value) {
+                output.select();
+                document.execCommand('copy');
+                showMessage(document.getElementById('analyzer-message'), 'Result copied to clipboard!', 'success');
+            }
+        });
+        
+        // Helper function to show messages
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Load example data for demonstration
+        window.addEventListener('load', () => {
+            // Example SVG content with section groups
+            const exampleSVG = `<svg width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="VFD_AND_MOTORS_MAP_SCADA" sodipodi:docname="VFD_AND_MOTORS_MAP_SCADA.svg" inkscape:export-filename="MOTORS_MAPPING_with ICONS.png" inkscape:export-xdpi="96" inkscape:export-ydpi="96" inkscape:version="1.4.2 (f4327f4, 2025-05-13)" xml:space="preserve" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" showgrid="false" inkscape:zoom="1.1172287" inkscape:cx="1682.7351" inkscape:cy="656.08769" inkscape:window-width="1920" inkscape:window-height="991" inkscape:window-maximized="1" inkscape:current-layer="g112" inkscape:export-bgcolor="#ffffffff" inkscape:window-x="-9" inkscape:window-y="-9" />
+  <defs id="defs1">
+    <font horiz-adv-x="1000" id="font1" horiz-origin-x="0" horiz-origin-y="0" vert-origin-x="512" vert-origin-y="768" vert-adv-y="1024">
+      <font-face units-per-em="1000" ascent="750" cap-height="600" x-height="400" descent="200" id="font-face1" font-family="SVGFont 1" />
+      <missing-glyph d="M0,0h1000v1000h-1000z" id="missing-glyph1" />
+    </font>
+  </defs>
+  <g id="SMALLBATCH" section_name="SMALL BATCH AREA" section_total_vfds="18" section_unique_models="7">
+    <text id="text8-6-2-9-1-6-2-6">
+      <tspan id="tspan8-2-6-2-9-3-2-3" />
+      <tspan id="tspan9-9-1-2-4-2-6-1">SMALL BATCH AREA</tspan>
+    </text>
+    <rect id="rect1"/>
+    <rect id="rect9"/>
+    <g id="PE-PS-241" equipment_id="PE-PS-241" equipment_name="MIXER MACHINE" power_rating="2HP" equipment_details="2 HP Drive Motor" vfd_brand_model="TECO A510" vfd_location="SMALL BATCH AREA">
+      <!-- VFD and machine content would be here -->
+    </g>
+    <g id="PE-PS-208" equipment_id="PE-PS-208" equipment_name="MIXER MACHINE" power_rating="40 HP" voltage="220VAC" equipment_details="20 HP 50A Drive Motor with Inverter 3 HP 8.6A Hydraulic" vfd_brand_model="TECO A510" vfd_location="SMALL BATCH AREA">
+      <!-- VFD and machine content would be here -->
+    </g>
+  </g>
+  <g id="MEDIUMBATCH" section_name="MEDIUM BATCH" section_total_vfds="25" section_unique_models="6">
+    <!-- Medium batch area content would be here -->
+    <g id="PE-PS-283" equipment_id="PE-PS-283" equipment_name="MIXER MACHINE" power_rating="50 HP" voltage="480V" equipment_details="50 HP Drive Motor with inverter" vfd_brand_model="HITACHI SJ7000N" vfd_location="EE ROOM 3">
+      <!-- VFD and machine content would be here -->
+    </g>
+  </g>
+  <g id="OLDPLATFORM" section_name="OLD PLATFORM" section_total_vfds="12" section_unique_models="3">
+    <!-- Old platform area content would be here -->
+  </g>
+</svg>`;
+            
+            // Set example data in all tabs
+            document.getElementById('svg-input-analyzer').value = exampleSVG;
+            document.getElementById('svg-input-json').value = exampleSVG;
+            document.getElementById('svg-input-regex').value = exampleSVG;
+            
+            // Set example JSON
+            const exampleJSON = `{
+  "sections": [
+    {
+      "name": "SMALL BATCH AREA",
+      "total_vfds": 18,
+      "unique_models": 7,
+      "equipment": [
+        {
+          "equipment_id": "PE-PS-241",
+          "equipment_name": "MIXER MACHINE 1",
+          "power_rating": "45 HP",
+          "voltage": "480V",
+          "equipment_details": "45 HP Drive Motor with inverter",
+          "vfd_brand_model": "TECO A510",
+          "vfd_location": "EE ROOM 1"
+        },
+        {
+          "equipment_id": "PE-PS-208",
+          "equipment_name": "MIXER MACHINE 2",
+          "power_rating": "30 HP",
+          "voltage": "480V",
+          "equipment_details": "30 HP Drive Motor with inverter",
+          "vfd_brand_model": "TECO A510",
+          "vfd_location": "EE ROOM 2"
+        }
+      ]
+    },
+    {
+      "name": "MEDIUM BATCH",
+      "total_vfds": 25,
+      "unique_models": 6,
+      "equipment": [
+        {
+          "equipment_id": "PE-PS-283",
+          "equipment_name": "MIXER MACHINE 3",
+          "power_rating": "50 HP",
+          "voltage": "480V",
+          "equipment_details": "50 HP Drive Motor with inverter",
+          "vfd_brand_model": "HITACHI SJ7000N",
+          "vfd_location": "EE ROOM 3"
+        }
+      ]
+    },
+    {
+      "name": "OLD PLATFORM",
+      "total_vfds": 12,
+      "unique_models": 3,
+      "equipment": []
+    }
+  ]
+}`;
+            document.getElementById('json-input').value = exampleJSON;
+            
+            // Set example data in the Regex tab
+            document.getElementById('find-regex').value = '<g id="PE-PS-(\\d+)">';
+            document.getElementById('replace-regex').value = '<g id="PE-PS-$1" equipment_id="PE-PS-$1">';
+        });
+    </script>
+</body>
+</html>
